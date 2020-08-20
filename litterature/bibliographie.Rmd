@@ -1,0 +1,13 @@
+---
+title: "Bibliograhie"
+output: 
+    pdf_document:
+        keep_tex: false
+bibliography: bibliographie.bib
+nocite: '@*'
+---
+
+```{r comment, include = FALSE}
+# \printbibliography[title={Whole bibliography}]
+# citation_package: biblatex
+```
