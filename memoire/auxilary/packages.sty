@@ -1,0 +1,117 @@
+%%%%%%%%%%%%%%%%%
+% Load Packages %
+%%%%%%%%%%%%%%%%%
+
+% Spacings
+\usepackage{setspace}
+
+% Tables
+\usepackage{longtable}
+\usepackage{tabu}
+
+% Floats
+\usepackage{morefloats}
+\usepackage{float}
+\usepackage{placeins}
+
+% Highlighting
+\usepackage{soul}
+
+% Horizontal page position
+\usepackage{pdflscape}
+
+% Append pdfs
+\usepackage{pdfpages}
+
+% Add latex chunks
+\usepackage{docmute}
+
+% Short toc
+\usepackage{shorttoc}
+%\setcounter{tocdepth}{1}
+%\usepackage{minitoc} - incompatible with document class
+
+% Referencing mutliple things with a single command - \cref
+\usepackage{cleveref}
+
+% Array
+\usepackage{array}
+
+% Multiple columns
+\usepackage{multicol}
+
+% Image insertion and colors
+\usepackage{graphicx}
+
+% Latex comments
+\newenvironment{dummy}{}{}
+
+% Fonts
+% \usepackage{fontspec}
+% \setmainfont{Museo}
+
+% drawing
+\usepackage{tikz}
+\usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
+
+\usepackage{dcolumn}
+% \usepackage{subfig}
+\usepackage[export]{adjustbox}
+% \usepackage[demo]{graphicx}  
+\usepackage{subcaption}
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{arrows.meta}
+\usepackage[edges]{forest}
+
+\usepackage{calc}
+
+%%%%%%%%%%%%%%%%%%%
+% Make Title Page %
+%%%%%%%%%%%%%%%%%%%
+
+% Maketitle definition
+\makeatletter
+\def\@maketitle{
+    \pagenumbering{gobble} % Ommit page numbering
+    % Add logos
+    \raggedright
+    \includegraphics[height = 30mm]{../images/uga_logo.png}  
+    \hspace{5mm}
+    %\includegraphics[height = 30mm]{../images/gael_logo_1.jpg}
+    \hspace{5mm}
+    %\includegraphics[height = 30mm]{../images/lig_logo_1.png}
+    % Add title
+    \begin{center}
+        \vspace*{\fill}
+            {\Huge \@title}\\
+            \par
+            \rule{7cm}{0.4pt}
+            \par
+            \textbf{Exploration of the Econometrics and Machine Learning models' performances in the presence of heterogeneous preferences and random effects utilities}\\ %[10mm] % Subtitle
+            \par
+            \rule{3cm}{0.4pt}
+            \par
+            \textbf{Research master thesis}\\[10mm]
+            {\Large \@author}\\
+        \vspace*{\fill}
+    \end{center}
+    % Add supplementary information
+    % \vspace{10mm}
+    % {\large Sous diréction de : }\\
+    % \hspace{10mm} {\large Directeur}\\ % A modifier ici
+    % \vspace{20mm}
+    % {\large Niveau d'études : }\\
+    % \hspace{10mm} {\large Niveau}\\ % A modifier ici
+    % {\large Parcours : }\\
+    % \hspace{10mm} {\large Parcours}\\ % A modifier ici
+    % \vspace{20mm}
+    % Add bottom section
+    \begin{center}
+        {\large Université Grenoble Alpes}\\ % Université
+        {\large Faculté d'Economie et Gestion - FEG}\\ % Faculty
+        \vspace{5mm}
+        2019 - 2020\\ % Year
+    \end{center}
+    \clearpage
+}
+\makeatother

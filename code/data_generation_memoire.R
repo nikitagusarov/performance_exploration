@@ -366,6 +366,7 @@ data_orig = data_orig %>%
     mutate(
         LC = label * carbon,
 		Data = "Original",
+		Buy = ifelse(buy == 2, 0, 1),
         buy_organic_nofood = buy_organic_nofood - 1,
         Alternative = ifelse(
 			rose == 1, "A",
@@ -386,7 +387,7 @@ data_orig = data_orig %>%
         Carbon = carbon,
         Label = label,
         Choice = choice,
-        Buy = buy,
+        Buy = Buy,
         Alternative,
 		Data
     ) %>%

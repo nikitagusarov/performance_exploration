@@ -19,6 +19,7 @@ library(doparallel)
 # Clusters
 doParallel::registerDoParallel(6)
 # registerDoParallel(cores = 6)
+library(mlogit)
 
 
 ##################
@@ -129,9 +130,9 @@ statistics = foreach (run = 1:10, .combine = "rbind") %:%
 
         res = foreach (
             NIndividuals = c(
-                10, 25, 50, 75, 100, 
-                150, 200, 250, 300, 350, 400, 450, 500, 
-                750, 1000), 
+                25, 50, 75, 100), 
+                # 250, 500), 
+                # 750, 1000), 
             .combine = "rbind") %do% {
                 
             timesreq = system.time({
@@ -161,6 +162,15 @@ statistics = foreach (run = 1:10, .combine = "rbind") %:%
                 "SU", "AU", "TU", 
                 "Choice"
             ) 
+            ## Add Labels
+            dataset$Alternative = rep(
+                c("A", "B", "C"),
+                length(nrow(dataset))
+            )
+            dataset$CHID = rep(
+                1:(nrow(dataset)/3),
+                each = 3
+            )
             ## Reshape
             dataset = dataset %>% 
                 mutate_all(
@@ -168,21 +178,79 @@ statistics = foreach (run = 1:10, .combine = "rbind") %:%
                 ) %>% 
                 mutate(
                     LC = Carbon * Label,
+                    Buy = ifelse(
+                        Alternative == "C",
+                        0, 1
+                    ),
                     UU = TU - (AU + SU)
+                ) %>% 
+                mutate(
+                    Sex = Buy * Sex, 
+                    Habit = Buy * Habit, 
+                    Salary = Buy * Salary,
+                    Age = Buy * Age
                 )
-            ## Add Labels
-            dataset$Alternative = rep(
-                c("A", "B", "C"),
-                length(nrow(dataset))
-            )
             ## Prepare data 
             dataset = dataset %>% 
                 select(
-                    Alternative,
+                    Alternative, CHID, ID,
                     Sex, Habit, Salary, Age,
-                    Price, Label, Carbon, Choice,
+                    Price, Label, Carbon, Choice, LC, Buy,
                     SU, AU, UU, TU
                 ) 
+
+            # MNL
+            ## Transform dataset to mlogit format
+            mnl_data = dataset %>% 
+                select(
+                    - SU, - AU, - UU, - TU
+                ) %>% 
+                mutate(
+                    LC = Label * Carbon
+                ) %>% 
+                mlogit.data(
+                    choice = "Choice",
+                    alt.var = "Alternative", 
+                    id = "ID", # Set individuals' index
+                    chid = "CHID", # Set choice sets index
+                    shape = "long", # Long format
+                    alt.levels = c("C", "A", "B") # Define order of alternatives
+                )
+            ## Function
+            utility = Choice ~ Sex + Age + Salary + Habit + # Individual characteristics
+                Price + Buy + Label + Carbon + LC + 0 | 0 # Alternatives attributes
+            ## Estimate MNL model
+            time_mnl = system.time({
+                mnl = mlogit(
+                        utility,
+                        data = mnl_data, 
+                        reflevel = "C", # The No-buy option is the baseline
+                        print.level = 0, # Print estimation details
+                        iterlim = 1000
+                    )
+            })
+            ## Estimate MMNL model
+            time_mmnl = system.time({
+                mmnl = mlogit(
+                        utility,
+                        data = mnl_data, 
+                        reflevel = "C", # The No-buy option is the baseline
+                        correlation = TRUE, # Include covariance (and not variance only)
+                        rpar =  c( # Normality assumption and four parameters
+                            "Buy" = "n", 
+                            "Label" = "n", 
+                            "Carbon" = "n", 
+                            "LC" = "n"
+                        ),
+                        panel = TRUE, # Estimate dataset as panel
+                        print.level = 0, # Print estimation details
+                        iterlim = 1000
+                    )
+            })
+            ## Remove data 
+            rm(mnl_dataset); gc()
+            
+            # Results 
             ## Results 
             data_mean = dataset %>% 
                 group_by(Alternative) %>%
@@ -210,7 +278,25 @@ statistics = foreach (run = 1:10, .combine = "rbind") %:%
                     sys.self = timesreq[2],
                     user.child = timesreq[4],
                     sys.child = timesreq[5],
-                    elapsed = timesreq[3]
+                    elapsed = timesreq[3],
+                    mnl.Sex = mnl$coef[1],
+                    mnl.Age = mnl$coef[2],
+                    mnl.Salary = mnl$coef[3],
+                    mnl.Habit = mnl$coef[4],
+                    mnl.Price = mnl$coef[5],
+                    mnl.Buy = mnl$coef[6],
+                    mnl.Label = mnl$coef[7],
+                    mnl.Carbon = mnl$coef[8],
+                    mnl.LC = mnl$coef[9], 
+                    mmnl.Sex = mmnl$coef[1],
+                    mmnl.Age = mmnl$coef[2],
+                    mmnl.Salary = mmnl$coef[3],
+                    mmnl.Habit = mmnl$coef[4],
+                    mmnl.Price = mmnl$coef[5],
+                    mmnl.Buy = mmnl$coef[6],
+                    mmnl.Label = mmnl$coef[7],
+                    mmnl.Carbon = mmnl$coef[8],
+                    mmnl.LC = mmnl$coef[9] 
                 )
             return(results)
         }
@@ -219,8 +305,8 @@ statistics = foreach (run = 1:10, .combine = "rbind") %:%
     }
 
 # Verification
-stat_novar = statistics
-save(stat_novar, file = "data/memoire/stat_novar.Rdata")
+modstat_novar = statistics
+save(modstat_novar, file = "data/memoire/modstat_novar.Rdata")
 
 
 
@@ -363,8 +449,8 @@ statistics %>%
     ) %>% 
     dplyr::filter(
         Type == "mean",
-        Alternative != "C"
-    ) %>% 
+        Alternative == "A"
+    ) %>% View()
     group_by(Individuals) %>%
     ggplot(aes(y = Sex, x = Individuals, col = Replications)) +
         stat_summary(
@@ -396,6 +482,7 @@ statistics %>%
     ) %>% 
     group_by(Individuals) %>%
     ggplot(aes(y = Habit, x = Individuals, col = Replications)) +
+        geom_point()
         stat_summary(
             geom = "ribbon", 
             fun.data = mean_sdl, 
@@ -543,7 +630,7 @@ statistics %>%
         Type == "mean",
         Alternative != "C"
     ) %>% 
-    group_by(Individuals) %>%
+    group_by(Individuals, Replications) %>%
     ggplot(aes(y = Price, x = Replications, col = Individuals)) +
         stat_summary(
             geom = "ribbon", 
@@ -621,7 +708,7 @@ statistics %>%
             high = "red"
         )
 
-# Socioeconomic utility
+# Total utility
 statistics %>% 
     mutate(
         Type = as.factor(Type)
@@ -662,7 +749,6 @@ statistics %>%
     group_by(
         Individuals, Replications
     ) %>% 
-    summarise_all(mean) %>%
     ggplot(aes(y = elapsed, x = Individuals, col = Replications)) +
         stat_summary(
             geom = "ribbon", 
@@ -690,7 +776,6 @@ statistics %>%
     group_by(
         Individuals, Replications
     ) %>% 
-    summarise_all(mean) %>%
     ggplot(aes(y = user.self, x = Individuals, col = Replications)) +
         stat_summary(
             geom = "ribbon", 
@@ -717,9 +802,39 @@ statistics %>%
     ) %>% 
     group_by(
         Individuals, Replications
-    ) %>% 
-    summarise_all(mean) %>%
+    ) %>% View()
     ggplot(aes(y = sys.self, x = Individuals, col = Replications)) +
+        stat_summary(
+            geom = "ribbon", 
+            fun.data = mean_sdl, 
+            fill = "lightblue"
+        ) +
+        stat_summary(
+            geom = "line", 
+            fun = mean, 
+            linetype = "dashed"
+        ) +
+        geom_point(
+            size = 1
+        ) + 
+        scale_color_gradient(
+            low = "blue", 
+            high = "red"
+        )
+
+#########################
+# Coefficient estimates #
+#########################
+
+# ...
+statistics %>% 
+    mutate(
+        Type = as.factor(Type)
+    ) %>% 
+    group_by(
+        Individuals, Replications
+    ) %>% 
+    ggplot(aes(y = mnl.Habit, x = Individuals, col = Replications)) +
         stat_summary(
             geom = "ribbon", 
             fun.data = mean_sdl, 

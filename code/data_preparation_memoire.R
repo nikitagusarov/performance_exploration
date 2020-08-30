@@ -326,16 +326,17 @@ rm(data_orig)
 
 # Individual 
 ind_dataset = dataset %>%
+    dplyr::filter(Alternative == "A") %>%
     select(
         ID, Data, Effects,
         Sex, Habit, Salary, Age
     ) %>% 
 	mutate(
         Dataset = ifelse(
-            Data == "Original", "Original",
+            Data == "Original", "Target",
             ifelse(
-                ((Data == "Generated") &  (Effects == "Fixed")), "Generated FE",
-                "Generated RE"
+                ((Data == "Generated") &  (Effects == "Fixed")), "Fixed Effects",
+                "Random Effects"
             ) 
         )
 	) %>%
@@ -357,10 +358,10 @@ alt_dataset = dataset %>%
     ) %>% 
 	mutate(
         Dataset = ifelse(
-            Data == "Original", "Original",
+            Data == "Original", "Target",
             ifelse(
-                ((Data == "Generated") &  (Effects == "Fixed")), "Generated FE",
-                "Generated RE"
+                ((Data == "Generated") &  (Effects == "Fixed")), "Fixed Effects",
+                "Random Effects"
             ) 
         ),
         "Price by group" = as.factor(Price)
