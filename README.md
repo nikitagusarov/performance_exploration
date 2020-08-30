@@ -1,5 +1,10 @@
 # Comparaison de performance de modèles de choix discret de consommation
 
+# Note explicative 
+
+Ce dossier de travail représente qu'une fraction de l'espace de travail complet, ou sont stockés les originaux des articles étudiés, ainsi que les elements supplémentaires, tels que les présentations, les rendus et rapport intermédiaires et les synthèses effectués lors de ce stage. 
+Le dossier original se trouve dans un espace privé sur *GitHub* pour des raisons de respect de droit d'auteur et l'inaccessibilité de l'information potentiellement sensible au grand public.
+
 # Résumé
 
 La littérature modélisant les choix en économie repose le plus souvent sur les Discrete Choice Models (DCM), fondés sur les modèles RUM (*Random Utility Models*) proposés par McFadden (McFadden (1974), McFadden (2001)).
