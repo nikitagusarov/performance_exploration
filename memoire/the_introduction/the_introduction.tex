@@ -1,0 +1,845 @@
+\documentclass[12pt,]{article}
+\usepackage{lmodern}
+\usepackage{setspace}
+\setstretch{1.15}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+    \setmainfont[]{XITS}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Performance comparison of the discrete choice models of consumer choice},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Performance comparison of the discrete choice models of consumer choice}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+  \subtitle{Exploration of the Econometrics and Machine Learning model performances
+in the presence of heterogeneous preferences and random effects
+utilities}
+  \author{\large Nikita Gusarov\\
+\normalsize Master 2\\
+MIASHS C2ES (UGA)\\
+~\\
+~\\
+\hspace{50mm}\\
+~\\
+~\\
+\raggedright Under supervision of:\\
+\raggedright\hspace{10mm} Iragaël Joly, HDR (GAEL, UGA, Grenoble INP)\\
+\raggedright\hspace{10mm} Beatrice Roussillon, MCF (GAEL, UGA)\\
+\hspace{-40mm}}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+    \date{}
+    \predate{}\postdate{}
+  
+%%%%%%%%%%%%%%%%%
+% Load Packages %
+%%%%%%%%%%%%%%%%%
+
+% Spacings
+\usepackage{setspace}
+
+% Tables
+\usepackage{longtable}
+\usepackage{tabu}
+
+% Floats
+\usepackage{morefloats}
+\usepackage{float}
+\usepackage{placeins}
+
+% Highlighting
+\usepackage{soul}
+
+% Horizontal page position
+\usepackage{pdflscape}
+
+% Append pdfs
+\usepackage{pdfpages}
+
+% Add latex chunks
+\usepackage{docmute}
+
+% Short toc
+\usepackage{shorttoc}
+%\setcounter{tocdepth}{1}
+%\usepackage{minitoc} - incompatible with document class
+
+% Referencing mutliple things with a single command - \cref
+\usepackage{cleveref}
+
+% Array
+\usepackage{array}
+
+% Multiple columns
+\usepackage{multicol}
+
+% Image insertion and colors
+\usepackage{graphicx}
+
+% Latex comments
+\newenvironment{dummy}{}{}
+
+% Fonts
+% \usepackage{fontspec}
+% \setmainfont{Museo}
+
+% drawing
+\usepackage{tikz}
+\usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
+
+\usepackage{dcolumn}
+% \usepackage{subfig}
+\usepackage[export]{adjustbox}
+% \usepackage[demo]{graphicx}  
+\usepackage{subcaption}
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{arrows.meta}
+\usepackage[edges]{forest}
+
+\usepackage{calc}
+
+%%%%%%%%%%%%%%%%%%%
+% Make Title Page %
+%%%%%%%%%%%%%%%%%%%
+
+% Maketitle definition
+\makeatletter
+\def\@maketitle{
+    \pagenumbering{gobble} % Ommit page numbering
+    % Add logos
+    \raggedright
+    \includegraphics[height = 30mm]{../images/uga_logo.png}  
+    \hspace{5mm}
+    %\includegraphics[height = 30mm]{../images/gael_logo_1.jpg}
+    \hspace{5mm}
+    %\includegraphics[height = 30mm]{../images/lig_logo_1.png}
+    % Add title
+    \begin{center}
+        \vspace*{\fill}
+            {\Huge \@title}\\
+            \par
+            \rule{7cm}{0.4pt}
+            \par
+            \textbf{Exploration of the Econometrics and Machine Learning models' performances in the presence of heterogeneous preferences and random effects utilities}\\ %[10mm] % Subtitle
+            \par
+            \rule{3cm}{0.4pt}
+            \par
+            \textbf{Research master thesis}\\[10mm]
+            {\Large \@author}\\
+        \vspace*{\fill}
+    \end{center}
+    % Add supplementary information
+    % \vspace{10mm}
+    % {\large Sous diréction de : }\\
+    % \hspace{10mm} {\large Directeur}\\ % A modifier ici
+    % \vspace{20mm}
+    % {\large Niveau d'études : }\\
+    % \hspace{10mm} {\large Niveau}\\ % A modifier ici
+    % {\large Parcours : }\\
+    % \hspace{10mm} {\large Parcours}\\ % A modifier ici
+    % \vspace{20mm}
+    % Add bottom section
+    \begin{center}
+        {\large Université Grenoble Alpes}\\ % Université
+        {\large Faculté d'Economie et Gestion - FEG}\\ % Faculty
+        \vspace{5mm}
+        2019 - 2020\\ % Year
+    \end{center}
+    \clearpage
+}
+\makeatother
+
+\begin{document}
+\maketitle
+
+\begin{description}
+
+\item[Abstract:] This works is a cross-disciplinary study of econometrics and machine learning (ML) models applied to consumer choice modelling. 
+To breach the interdisciplinary gap an integrated simulation and theory-testing framework is proposed. 
+It incorporates all essential steps from hypothetical setting generation to the comparison of various performance metrics. \vspace{0.1cm}\\ 
+The flexibility of the framework in theory-testing and models comparison over economics and statistical indicators is illustrated based on the work of Michaud, Llerena and Joly (2012). 
+Two datasets are generated using the predefined utility functions simulating the presence of homogeneous and heterogeneous individual preferences for alternatives' attributes. 
+Then, three models issued from econometrics and ML disciplines are estimated and compared. \vspace{0.1cm}\\ 
+This study shows the proposed methodological approach's efficiency, successfuly capturing the differences between the models issued from different fields given the homogeneous or heterogeneous consumer preferences. 
+
+\item[Key words:] Consumer Choice, Preference Studies, Willingness to Pay, Econometrics, Data Science, Machine Learning, Classification Techniques, Synthetic Datasets
+
+\item[Author:] Nikita Gusarov (UGA)
+
+\item[Under supervision of:] Iragaël Joly, HDR (GAEL, UGA, Grenoble INP); Beatrice Roussillon, MCF (GAEL, UGA)
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+\item[Abstrait:] Ce travail est une étude interdisciplinaire des modèles d'économétrie et d'apprentissage automatique (ML) appliqués à la modélisation des choix des consommateurs.
+Pour briser la frontière interdisciplinaire, un cadre intégré pour tester des théorie est proposé.
+Il intègre toutes les étapes essentielles de la génération de paramètres hypothétiques à la comparaison de diverses mesures de performance. \vspace{0.1cm}\\ 
+La flexibilité du cadre dans les tests de théorie et la comparaison de modèles par rapport aux indicateurs économiques et statistiques est illustrée à partir des travaux de Michaud, Llerena et Joly (2012).
+Deux ensembles de données sont générés à l'aide des fonctions d'utilité prédéfinies simulant la présence de préférences individuelles homogènes et hétérogènes pour les attributs des alternatives.
+Trois modèles issus des disciplines économétrie et ML sont ensuite estimés et comparés. \vspace{0.1cm}\\ 
+Cette étude montre l'efficacité de l'approche méthodologique proposée, en captant avec succès les différences entre les modèles issus de différents domaines compte tenu des préférences homogènes ou hétérogènes des consommateurs.
+
+\item[Mots clés:] Choix du consommateur, \'Etudes de Préférences, Consentements à Payer, \'Econométrie, Science des Données, Apprentissage Automatique, Techniques de Classification, Données Synthétiques
+
+\end{description}
+
+\newpage
+
+\begin{center}
+\textbf{\Large Acknowledgements}
+\end{center}
+\vspace{2.3ex}
+
+This work was accomplished with financial aid from Multidisciplinary
+Institute in Artificial Intelligence (MIAI), supported by Sihem
+Amer-Yahia, head of the SLIDE team at the LIG laboratory.
+
+\vspace{10mm}
+
+I would like to express my gratitude for the administrative and
+technical support from the Grenoble Informatics Laboratory (LIG) and
+Grenoble Applied Economics Laboratory (GAEL), which helped to fulfil
+this work during COVID-19 crisis.
+
+\vspace{10mm}
+
+Credits for dataset generation algorithm go to Amirreza Talebijamalabad,
+first year master student at Grenoble INP, who worked on the theory of
+the artificial datasets generation.
+
+\newpage
+
+\pagenumbering{roman}
+
+\setcounter{tocdepth}{1}
+
+\shorttoc{Summary}{2}
+
+\newpage
+
+\pagenumbering{arabic}
+
+\hypertarget{introduction}{%
+\section*{Introduction}\label{introduction}}
+\addcontentsline{toc}{section}{Introduction}
+
+The advances in statistical learning, data analysis and data science of
+the past decades have resulted in propagation of \emph{Machine Learning}
+(ML) techniques to different applied fields, including social and human
+sciences. Nowadays, it is impossible to imagine a field of science that
+is not benefiting from the fruits of statistical learning. The works of
+De Palma et al. (2011) and Cascetta (2009) on transportation modelling,
+the publications of Molina and Garip (2019) dedicated to sociology
+problematic, the articles of Coussement, Benoit, and Poel (2010)
+concerning marketing decisions, actuary analysis studies (Denuit and
+Trufin (2019), Denuit and Hainaut (2019)) or even psychology with an
+example of Baayen et al. (2017) work reflect the literal omnipresence of
+the newly developed techniques.
+
+However, there exist two completely distinct approaches to applying
+statistical learning, as described by Breiman and others (2001) and
+latter by Athey and Imbens (2019): the \emph{Machine Learning} which
+focuses on the predictive qualities (figure \ref{fig:parad3}) and
+\emph{Econometrics} which attempts to decipher the underlying properties
+of the data (figure \ref{fig:parad2}). In economics, where the research
+is focused on hidden patterns exploration, the scientific community
+prefers to implement the traditional econometrics techniques using the
+more advanced statistical models only in some special cases or as some
+assistance tools (Athey 2018). This discrepancy is explained by the fact
+that econometrics, contrary to traditional ML paradigm focusses on the
+accessibility of results. Consequently, many of the advanced ML
+techniques rarely appear in economics publications because of their
+believed lack of interpretability and excessive complexity in
+application. Nevertheless, some multidisciplinary scientists make
+attempts to breach this wall between \emph{ML} and \emph{Econometrics}:
+Varian (2014), Mullainathan and Spiess (2017) or, among the most recent,
+Athey and Imbens (2019). Their advances are mostly focused on resolving
+the general interdisciplinary tool-set integration questions, without
+considering the application specific details. Nevertheless, in the
+attempt to breach the interdisciplinary barrier the details reveal
+themselves to be of utmost importance in the solution of the problem.
+
+\begin{figure}[hbtp]
+\centering
+\caption{The different paradigms}
+\label{fig:parad}
+\begin{subfigure}[c]{.4\linewidth}
+    \centering
+    \caption{Real world}
+    \label{fig:parad1}
+    \begin{tikzpicture}[box/.style = {draw, text width=2cm, align=center}]
+        \node[box] (b) {Nature};
+        \node[left=of b] (a) {$\mathcal{X}$};
+        \node[right=of b] (c) {$\mathcal{Y}$};
+        \draw[->] (a) -- (b);
+        \draw[->] (b) -- (c);
+    \end{tikzpicture}
+\end{subfigure}\hspace{12pt}\vspace{12pt}
+
+\begin{subfigure}[c]{.4\linewidth}
+    \centering
+    \caption{Econometrics}
+    \label{fig:parad2}
+    \begin{tikzpicture}[box/.style = {draw, text width=2cm, align=center}]
+        \node[box] (b) {Theoretical\\model};
+        \node[left=of b] (a) {$X$};
+        \node[right=of b] (c) {$Y$};
+        \draw[->] (a) -- (b);
+        \draw[->] (b) -- (c);
+    \end{tikzpicture}
+\end{subfigure}\hspace{12pt}
+\begin{subfigure}[c]{.4\linewidth}
+    \centering
+    \caption{Machine Learning}
+    \label{fig:parad3}
+    \begin{tikzpicture}[box/.style = {draw, text width=2cm, align=center}]
+        \node[box] (b) {Nature};
+        \node[box, below=of b] (d) {ML\\model};
+        \node[left=of b] (a) {$X$};
+        \node[right=of b] (c) {$Y$};
+        \draw[->] (a) -- (b);
+        \draw[->] (b) -- (c);
+        \draw[->] (a) |- (d);
+        \draw[->] (d) -| (c);
+    \end{tikzpicture}
+\end{subfigure}\hspace{12pt}
+\end{figure}
+
+There have already been a multitude of studies comparing the
+performances of different econometric and ML models in various real
+world scenarios: the study of machine learning methods to model the car
+ownership demand estimation of Paredes et al. (2017), for example; or
+the use of decision trees in microeconomics of Brathwaite, Vij, and
+Walker (2017). However, there's no known to us work incorporating at
+least all the baseline models, as it would require an unimaginable
+amount of efforts to accomplish. For instance, in the literature the
+performance of competing models are studied according to several
+absolutely alien criteria: in terms of the quality of data adjustments,
+in terms of predictive capacity, as well as in terms of the quality of
+the economic and behavioural indicators derived from estimates and,
+finally, according to their algorithmic efficiency and computational
+costs. None of the known to us articles manages to incorporate all these
+aspects into their benchmarks, limiting their studies only with several
+performance criteria.
+
+These various aspects, greatly impact the performance of particular
+models or algorithms, although some of them are often ignored by the
+researchers. Not only there exists inconsistency in the targeted
+performance metrics in the contemporary models' comparisons, but there
+is also omnipresent problems of theoretical background choice, dataset
+selection or model's specifications. For example, speaking about the
+datasets used to support their findings, many researchers explore the
+impacts of different specifications on the same observed or simulated
+choice situation (Munizaga and Alvarez-Daziano (2005), Fiebig et al.
+(2010), McCausland and Marley (2013), Bouscasse, Joly, and Peyhardi
+(2019)) as it appears to be the most theoretically reliable procedure.
+However, there is still no established unified methodology documenting
+this field.
+
+From this unambiguity in the scientific community the main problematic
+of this work arises. It is particularly important to establish a common
+framework for performance comparison of the discrete choice models be
+they from the econometrics or ML tool-set. However, this task cannot be
+accomplished outside a precise context, which will potentially impose
+some limitations over the models' structure, as well as influence the
+choice of performance metrics. In economics the discrete choice models
+are extensively used for consumer choice analysis (Anderson, De Palma,
+and Thisse 1992), willingness to pay derivation (Michaud, Llerena, and
+Joly 2012) and other preference studies. The field specific theories and
+traditional research objectives frame and define this study's scope.
+
+From the economics perspective there exist three major points of
+interest to be taken into account. First, there is a strong interest in
+economics to explore the different behavioural set-ups, under different
+settings and assumptions. Secondly, given the different choice
+situations there is a potential need to test how the available
+mathematical models, potentially sensitive to the tested behavioural
+hypotheses or dependent on these hypotheses, perform in a given context.
+Last, but not least, a comprehensive implementation of a performance
+evaluation methodology, combining reproducibility and control of
+experimental conditions, should be introduced in the proposed framework.
+
+\textbf{Consumer choice}
+
+The economic decision theory derives mostly from the random utility
+theory (RUM) of McFadden (1974) and more recently of McFadden (2001),
+that were recently challenged by alternative visions such as random
+regret minimisation theory (RRM) of Chorus (2010), with a related
+relative advantage maximisation theory (RAM) of Leong and Hensher
+(2015), or even quantum decision theory (QDT) of Yukalov and Sornette
+(2017), which offers a wide range of tools for modelling under
+uncertainty.
+
+These different theories address various aspects of the decision making
+process, under different suppositions and incorporating different
+biases. For example, one of the basic assumptions of the traditional
+choice theory is the transitivity of choice, meaning there exists a
+strict hierarchy of individual preferences among alternatives. This
+assumption may be unsuitable for real world choice situation and lead to
+potential bias, which is addressed by quantum decision theory. QDT
+manages to bypass this shortcoming and incorporate non-transitivity of
+choices into the framework. There exist a multitude of other behavioural
+elements unexplained by the most traditional models that may be
+incorporated into the decision making framework, such as loss aversion
+for example, that could be addressed with random regret minimisation
+theory.
+
+There is a particular interest in detecting the differences in the
+models' performances depending on the choice context and the assumed
+decision-making framework. It is important, because different consumer
+behaviour in the individual choice context result in different choice
+distributions, which may affect the models' performances. In economics
+RUM theory is nowadays one of the most used choice settings in the
+individual decision modelling. Nevertheless, there still exist some
+unexplored limitations, that such theoretical framework may impose over
+the estimation techniques, as well as to what potential biases a model's
+misspecification may lead.
+
+\textbf{Mathematical models}
+
+In general any classification technique may be used to model individual
+decisions, although nearly every model has some restrictions and
+limitations, which may largely affect its performances in a given
+context.
+
+Usually the choice of model is rarely discussed in applied studies, as
+the researchers tend to use either the simplest model possible or
+attempt to implement one particular model of interest ignoring some
+times the other possible choices. For example, many traditional
+econometrics studies, given a multiple choice problem context, use a
+multinomial logistic regression (MNL) or even simplify the problem to a
+binary case, allowing to implement even more traditional models such as
+binary logit or binary probit models. However, there exists a multitude
+of particular cases in modelling individual choices, that require
+specific techniques to be implemented. A family of duration models may
+be used to model the individual decisions over time (Vitetta (2016));
+network modelling that allows to incorporate spatial and social
+dependencies for the explored data (Brock and Durlauf (2003));
+preference learning techniques aiming to explore the positioning of
+different alternatives by an individual (Tsoukiàs and Viappiani (2013),
+Pigozzi, Tsoukiàs, and Viappiani (2016)) and many other advanced
+techniques from \emph{machine learning} field such as neural networks or
+support vector machines.
+
+An incorrect choice of the modelling technique may have a strong impact
+on the derived target values leading to some erroneous conclusions in
+the end. For example, an incorrectly estimated willingness to pay for a
+particular product may lead to significant losses. When conducting an
+applied research study one should always be conscious of the eventual
+biases introduced by the choice of the model and the eventual
+consequences of these choices. Some models are not suitable to be
+implemented on a particular set of data, while others are unable to
+provide necessary information about the relationships within a
+particular dataset or derive the particular target values of interest.
+
+Taking into account the implications of RUM theory, there exists a
+particular interest to make the focus on the state of art econometric
+discrete choice models (Agresti (2013), Agresti (2007), Baltagi (2008),
+Train (2009), McFadden (2001), McFadden (1974)) as well as their
+counterparts used in ML (Hastie, Tibshirani, and Friedman (2009),
+Kotsiantis, Zaharakis, and Pintelas (2006)). A comparison of some simple
+models against more complex ones may reveal the trade-off between
+precise estimates and the resources invested.
+
+\textbf{Data}
+
+Different sources of data are available for a researcher, that could be
+divided into two groups (Japkowicz and Shah 2011): \emph{field
+datasets}, which are gathered through an experiment or collected from
+the real world observations or real world uncontrolled experiment; and
+\emph{synthetic datasets}, which are artificially generated by the
+researcher to suit his needs and respect some particular limitations.
+Although this variability of dataset choices not that evident in the
+context of applied studies, there is an ongoing debate concerning the
+eventual impacts of data choice on the models' performances and
+resulting metrics.
+
+Given a task of performance evaluation and comparison for different
+algorithms or mathematical models there is always a difficult choice of
+the data type to be used in the study. Both of the mentioned above
+dataset types have their advantages and disadvantages and require a
+particular attention. However, having for objective the theory- and
+model-testing framework construction there is a strong interest to use
+the artificially generated data in order to have as much control as
+possible over the situation.
+
+\textbf{The framework and context}
+
+Given these three key elements we propose an integrated simulation and
+theory-testing framework which will encompass all the different aspects
+of the model comparison task. The steps to be integrated into such
+framework encompass many theoretical questions starting with the
+underlying theoretical assumptions and ending with the choice of correct
+performance metrics. Consequently, this work attempts to fill the gap
+between two statistical paradigms: \emph{econometrics} and \emph{machine
+learning}, taking into account the key elements, among which the
+different combinations of decision theory assumptions, dataset
+generation procedures, mathematical models and target performance
+measures. The problematic arises from the insufficient points of contact
+among researchers from different fields of applications, as well as
+insufficiently unified methodology to put into relations the different
+approaches. A work that uses unified knowledge from several disciplines
+might be highly beneficial for the scientific community as it will lie a
+foundation and provide support for future applied studies. Following the
+logic of Athey (2018) and Mullainathan and Spiess (2017) the project
+will attempt to merge the essentials of ML and econometrics paradigms,
+retaining their key concepts in the context of consumer choice problem.
+
+We propose to use an applied paper in econometrics of choice modelling
+to facilitate understanding of the field of application and tools. This
+means not that we will attempt to replicate the results, but rather to
+use the context provided in the work for demonstration of the proposed
+hypothesis-testing framework. We select the article of Michaud, Llerena,
+and Joly (2012) as our reference paper, because of the advantages to
+work directly with the authors of the paper. The work of Michaud,
+Llerena, and Joly (2012) is focused on investigation of consumers'
+willingness to pay (WTP) for environmental attributes of a non-food
+agricultural products, taking roses as example. Authors constructed an
+experimental framework to derive the premium the testing subjects were
+ready to pay for such environmental attributes as lower carbon imprint
+and ecological labelling, certifying the source of the environmentally
+friendly practices. That study explored individual preferences for roses
+with an eco-label and a carbon footprint using discrete choice modelling
+techniques and real economic incentives resulting in real purchases of
+roses. The gathered dataset was analysed with a mixed logit model
+demonstrating notorious premiums for both attributes. We will benefit of
+the obtained results to demonstrate all of the complexity of a proposed
+theory-testing framework, its functionality and perspectives.
+
+The present report is divided into two main parts. The first section
+presents the chosen context for this work followed by short
+presentations of all the theoretical aspects which play their major
+roles in this study, tracing at the same time parallels with the
+context. The second part presents the results of all the results
+step-by-step, demonstrating the functionality of the designed framework.
+Each of the sections has an identical logical structure of presentation
+of the framework's components in the successive order: starting with the
+behavioural modelling and data related questions, directly followed by
+the models' presentation and the performance measures. The final section
+concludes.
+
+\newpage
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-agresti2007cd}{}%
+Agresti, Alan. 2007. \emph{An Introduction to Categorical Data Analysis,
+Second Edition}.
+
+\leavevmode\hypertarget{ref-agresti2013cd}{}%
+---------. 2013. \emph{Categorical Data Analysis, Third Edition}.
+
+\leavevmode\hypertarget{ref-R-keras}{}%
+Allaire, JJ, and François Chollet. 2020. \emph{Keras: R Interface to
+'Keras'}. \url{https://CRAN.R-project.org/package=keras}.
+
+\leavevmode\hypertarget{ref-R-tensorflow}{}%
+Allaire, JJ, and Yuan Tang. 2020. \emph{Tensorflow: R Interface to
+'Tensorflow'}. \url{https://CRAN.R-project.org/package=tensorflow}.
+
+\leavevmode\hypertarget{ref-R-rmarkdown}{}%
+Allaire, JJ, Yihui Xie, Jonathan McPherson, Javier Luraschi, Kevin
+Ushey, Aron Atkins, Hadley Wickham, Joe Cheng, Winston Chang, and
+Richard Iannone. 2018. \emph{Rmarkdown: Dynamic Documents for R}.
+\url{https://CRAN.R-project.org/package=rmarkdown}.
+
+\leavevmode\hypertarget{ref-anderson1992discrete}{}%
+Anderson, Simon P, Andre De Palma, and Jacques-Francois Thisse. 1992.
+\emph{Discrete Choice Theory of Product Differentiation}. MIT press.
+
+\leavevmode\hypertarget{ref-athey2018iml}{}%
+Athey, Susan. 2018. ``The Impact of Machine Learning on Economics.''
+Book. In \emph{The Economics of Artificial Intelligence: An Agenda}, by
+Ajay Agrawal, Joshua Gans, and Avi Goldfarb, 507--47. National Bureau of
+Economic Research; University of Chicago Press.
+\url{https://doi.org/https://doi.org/10.7208/chicago/9780226613475.001.0001}.
+
+\leavevmode\hypertarget{ref-athey2019ml}{}%
+Athey, Susan, and Guido W. Imbens. 2019. ``Machine Learning Methods That
+Economists Should Know About.'' \emph{Annual Review of Economics} 11
+(1): 685--725.
+\url{https://doi.org/10.1146/annurev-economics-080217-053433}.
+
+\leavevmode\hypertarget{ref-baayen2017gam}{}%
+Baayen, Harald, Shravan Vasishth, Reinhold Kliegl, and Douglas Bates.
+2017. ``The Cave of Shadows: Addressing the Human Factor with
+Generalized Additive Mixed Models.'' \emph{Journal of Memory and
+Language} 94: 206--34.
+\url{https://doi.org/https://doi.org/10.1016/j.jml.2016.11.006}.
+
+\leavevmode\hypertarget{ref-baltagi2008econometric}{}%
+Baltagi, Badi. 2008. \emph{Econometric Analysis of Panel Data}. John
+Wiley \& Sons.
+
+\leavevmode\hypertarget{ref-joly2019qcm}{}%
+Bouscasse, Hélène, Iragaël Joly, and Jean Peyhardi. 2019. ``A new family
+of qualitative choice models: An application of reference models to
+travel mode choice.'' \emph{Transportation Research Part B:
+Methodological} 121 (C): 74--91.
+\url{https://doi.org/10.1016/j.trb.2018.12.010}.
+
+\leavevmode\hypertarget{ref-brathwaite2017machine}{}%
+Brathwaite, Timothy, Akshay Vij, and Joan L Walker. 2017. ``Machine
+Learning Meets Microeconomics: The Case of Decision Trees and Discrete
+Choice.'' \emph{arXiv Preprint arXiv:1711.04826}.
+
+\leavevmode\hypertarget{ref-breiman2001stat}{}%
+Breiman, Leo, and others. 2001. ``Statistical Modeling: The Two Cultures
+(with Comments and a Rejoinder by the Author).'' \emph{Statistical
+Science} 16 (3). Institute of Mathematical Statistics: 199--231.
+
+\leavevmode\hypertarget{ref-brock2003mcsi}{}%
+Brock, William, and Steven Durlauf. 2003. ``Multinomial Choice with
+Social Interactions.'' NBER Technical Working Papers 0288. National
+Bureau of Economic Research, Inc.
+\url{https://EconPapers.repec.org/RePEc:nbr:nberte:0288}.
+
+\leavevmode\hypertarget{ref-cascetta2009tr}{}%
+Cascetta, Ennio. 2009. \emph{Transportation Systems Analysis: Models and
+Applications}. Vol. 29. Springer Science \& Business Media.
+
+\leavevmode\hypertarget{ref-chorus2010rrm}{}%
+Chorus, Caspar G. 2010. ``A New Model of Random Regret Minimization.''
+\emph{European Journal of Transport and Infrastructure Research} 10 (2).
+
+\leavevmode\hypertarget{ref-coussement2010gam}{}%
+Coussement, Kristof, Dries F. Benoit, and Dirk Van den Poel. 2010.
+``Improved Marketing Decision Making in a Customer Churn Prediction
+Context Using Generalized Additive Models.'' \emph{Expert Systems with
+Applications} 37 (3): 2132--43.
+\url{https://doi.org/https://doi.org/10.1016/j.eswa.2009.07.029}.
+
+\leavevmode\hypertarget{ref-R-mlogit}{}%
+Croissant, Yves. 2020. \emph{Mlogit: Multinomial Logit Models}.
+\url{https://CRAN.R-project.org/package=mlogit}.
+
+\leavevmode\hypertarget{ref-denuit2019as3}{}%
+Denuit, Michel, and Donatien Hainaut. 2019. \emph{Effective Statistical
+Learning Methods for Actuaries Iii: Neural Networks and Extentions}.
+Springer.
+
+\leavevmode\hypertarget{ref-denuit2019as1}{}%
+Denuit, Michel, and Julien Trufin. 2019. \emph{Effective Statistical
+Learning Methods for Actuaries I: GLMs and Extentions}. Springer.
+
+\leavevmode\hypertarget{ref-depalma2011tr}{}%
+De Palma, André, Robin Lindsey, Emile Quinet, and Roger Vickerman. 2011.
+\emph{A Handbook of Transport Economics}. Edward Elgar Publishing.
+
+\leavevmode\hypertarget{ref-fiebig2010gmlm}{}%
+Fiebig, Denzil, Michael Keane, Jordan Louviere, and Nada Wasi. 2010.
+``The Generalized Multinomial Logit Model: Accounting for Scale and
+Coefficient Heterogeneity.'' \emph{Marketing Science} 29 (3): 393--421.
+\url{https://EconPapers.repec.org/RePEc:inm:ormksc:v:29:y:2010:i:3:p:393-421}.
+
+\leavevmode\hypertarget{ref-hastie2009sl}{}%
+Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. \emph{The
+Elements of Statistical Learning: Data Mining, Inference, and
+Prediction}. Springer Science \& Business Media.
+
+\leavevmode\hypertarget{ref-R-arsenal}{}%
+Heinzen, Ethan, Jason Sinnwell, Elizabeth Atkinson, Tina Gunderson, and
+Gregory Dougherty. 2020. \emph{Arsenal: An Arsenal of 'R' Functions for
+Large-Scale Statistical Summaries}.
+\url{https://CRAN.R-project.org/package=arsenal}.
+
+\leavevmode\hypertarget{ref-R-stargazer}{}%
+Hlavac, Marek. 2018. \emph{Stargazer: Well-Formatted Regression and
+Summary Statistics Tables}.
+\url{https://CRAN.R-project.org/package=stargazer}.
+
+\leavevmode\hypertarget{ref-japkowicz2011el}{}%
+Japkowicz, Nathalie, and Mohak Shah. 2011. \emph{Evaluating Learning
+Algorithms: A Classification Perspective}. Cambridge University Press.
+\url{https://doi.org/10.1017/CBO9780511921803}.
+
+\leavevmode\hypertarget{ref-kotsiantis2006tr}{}%
+Kotsiantis, Sotiris, I. Zaharakis, and P. Pintelas. 2006. ``Machine
+Learning: A Review of Classification and Combining Techniques.''
+\emph{Artificial Intelligence Review} 26 (November): 159--90.
+\url{https://doi.org/10.1007/s10462-007-9052-3}.
+
+\leavevmode\hypertarget{ref-leong2015ram}{}%
+Leong, Waiyan, and David A. Hensher. 2015. ``Contrasts of Relative
+Advantage Maximisation with Random Utility Maximisation and Regret
+Minimisation.'' \emph{Journal of Transport Economics and Policy (JTEP)}
+49 (1): 167--86.
+\url{https://www.ingentaconnect.com/content/lse/jtep/2015/00000049/00000001/art00010}.
+
+\leavevmode\hypertarget{ref-mccausland2013pd}{}%
+McCausland, William J., and A.A.J. Marley. 2013. ``Prior Distributions
+for Random Choice Structures.'' \emph{Journal of Mathematical
+Psychology} 57 (3): 78--93.
+\url{https://doi.org/https://doi.org/10.1016/j.jmp.2013.05.001}.
+
+\leavevmode\hypertarget{ref-mcfadden1974utd}{}%
+McFadden, Daniel. 1974. ``The Measurement of Urban Travel Demand.''
+\emph{Journal of Public Economics} 3 (4): 303--28.
+\url{https://doi.org/https://doi.org/10.1016/0047-2727(74)90003-6}.
+
+\leavevmode\hypertarget{ref-mcfadden2001ec}{}%
+---------. 2001. ``Economic Choices.'' \emph{The American Economic
+Review} 91 (3). American Economic Association: 351--78.
+\url{http://www.jstor.org/stable/2677869}.
+
+\leavevmode\hypertarget{ref-llerena2013rose}{}%
+Michaud, Celine, Daniel Llerena, and Iragael Joly. 2012. ``Willingness
+to pay for environmental attributes of non-food agricultural products: a
+real choice experiment.'' \emph{European Review of Agricultural
+Economics} 40 (2): 313--29. \url{https://doi.org/10.1093/erae/jbs025}.
+
+\leavevmode\hypertarget{ref-R-foreach}{}%
+Microsoft, and Steve Weston. 2020. \emph{Foreach: Provides Foreach
+Looping Construct}. \url{https://CRAN.R-project.org/package=foreach}.
+
+\leavevmode\hypertarget{ref-molina2019soc}{}%
+Molina, Mario, and Filiz Garip. 2019. ``Machine Learning for
+Sociology.'' \emph{Annual Review of Sociology} 45 (1): 27--45.
+\url{https://doi.org/10.1146/annurev-soc-073117-041106}.
+
+\leavevmode\hypertarget{ref-mullainathan2017ml}{}%
+Mullainathan, Sendhil, and Jann Spiess. 2017. ``Machine Learning: An
+Applied Econometric Approach.'' \emph{Journal of Economic Perspectives}
+31 (2): 87--106. \url{https://doi.org/10.1257/jep.31.2.87}.
+
+\leavevmode\hypertarget{ref-munizaga2005mlyp}{}%
+Munizaga, Marcela A., and Ricardo Alvarez-Daziano. 2005. ``Testing Mixed
+Logit and Probit Models by Simulation.'' \emph{Transportation Research
+Record} 1921 (1): 53--62.
+\url{https://doi.org/10.1177/0361198105192100107}.
+
+\leavevmode\hypertarget{ref-paredes2017machine}{}%
+Paredes, Miguel, Erik Hemberg, Una-May O'Reilly, and Chris Zegras. 2017.
+``Machine Learning or Discrete Choice Models for Car Ownership Demand
+Estimation and Prediction?'' In \emph{2017 5th Ieee International
+Conference on Models and Technologies for Intelligent Transportation
+Systems (Mt-Its)}, 780--85. IEEE.
+
+\leavevmode\hypertarget{ref-pigozzi2016pai}{}%
+Pigozzi, Gabriella, Alexis Tsoukiàs, and Paolo Viappiani. 2016.
+``Preferences in Artificial Intelligence.'' \emph{Annals of Mathematics
+and Artificial Intelligence} 77 (3-4). Springer Verlag: 361--401.
+\url{https://doi.org/10.1007/s10472-015-9475-5}.
+
+\leavevmode\hypertarget{ref-R-foreign}{}%
+R Core Team. 2018a. \emph{Foreign: Read Data Stored by 'Minitab', 'S',
+'Sas', 'Spss', 'Stata', 'Systat', 'Weka', 'dBase', ...}
+\url{https://CRAN.R-project.org/package=foreign}.
+
+\leavevmode\hypertarget{ref-R-base}{}%
+---------. 2018b. \emph{R: A Language and Environment for Statistical
+Computing}. Vienna, Austria: R Foundation for Statistical Computing.
+\url{https://www.R-project.org/}.
+
+\leavevmode\hypertarget{ref-R-sdcm}{}%
+Talebijamalabad, Amirreza, Nikita Gusarov, and Iragael Joly. 2020.
+\emph{Sdcm: Simulation of Discrete Choice Models}.
+
+\leavevmode\hypertarget{ref-train2009dc}{}%
+Train, Kenneth E. 2009. \emph{Discrete Choice Methods with Simulation}.
+Cambridge university press.
+
+\leavevmode\hypertarget{ref-tsoukias2013ph}{}%
+Tsoukiàs, Alexis, and Paolo Viappiani. 2013. ``Tutorial on preference
+handling.'' In \emph{ACM Conference on Recommender System (RecSys)},
+497--98. Hong Kong, China.
+\url{https://doi.org/10.1145/2507157.2508065}.
+
+\leavevmode\hypertarget{ref-varian2014bd}{}%
+Varian, Hal R. 2014. ``Big Data: New Tricks for Econometrics.''
+\emph{Journal of Economic Perspectives} 28 (2): 3--28.
+\url{https://doi.org/10.1257/jep.28.2.3}.
+
+\leavevmode\hypertarget{ref-vitetta2016quantum}{}%
+Vitetta, Antonino. 2016. ``A Quantum Utility Model for Route Choice in
+Transport Systems.'' \emph{Travel Behaviour and Society} 3. Elsevier:
+29--37.
+
+\leavevmode\hypertarget{ref-R-tidyverse}{}%
+Wickham, Hadley. 2019. \emph{Tidyverse: Easily Install and Load the
+'Tidyverse'}. \url{https://CRAN.R-project.org/package=tidyverse}.
+
+\leavevmode\hypertarget{ref-R-knitr}{}%
+Xie, Yihui. 2020a. \emph{Knitr: A General-Purpose Package for Dynamic
+Report Generation in R}. \url{https://CRAN.R-project.org/package=knitr}.
+
+\leavevmode\hypertarget{ref-R-tinytex}{}%
+---------. 2020b. \emph{Tinytex: Helper Functions to Install and
+Maintain Tex Live, and Compile Latex Documents}.
+\url{https://CRAN.R-project.org/package=tinytex}.
+
+\leavevmode\hypertarget{ref-yukalov2017quantum}{}%
+Yukalov, Vyacheslav I, and Didier Sornette. 2017. ``Quantum
+Probabilities as Behavioral Probabilities.'' \emph{Entropy} 19 (3).
+Multidisciplinary Digital Publishing Institute: 112.
+
+
+\end{document}

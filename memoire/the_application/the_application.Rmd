@@ -1,0 +1,60 @@
+---
+output: 
+    pdf_document:
+        toc: FALSE
+        df_print: "kable"
+        fig_width: 5
+        fig_height: 4
+        fig_caption: true
+header-includes:
+    - \usepackage{placeins}
+    - \AtBeginDocument{\let\maketitle\relax}
+fontsize: 11pt
+bibliography: ../../litterature/bibliographie.bib
+---
+
+
+
+
+
+
+
+```{r Knitr, echo = FALSE}
+#################
+# Knitr options #
+#################
+
+knitr::opts_chunk$set(
+    fig.align = "center",
+    echo = FALSE
+)
+```
+
+```{r Packages, echo= FALSE, include = FALSE}
+####################
+# PAckages and AUX #
+####################
+
+# General document wide packages
+library(tidyverse)
+library(stargazer)
+```
+
+
+
+
+
+
+
+
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+
+# Model comparison in practice: an application 
+
+This section is designed to present the results of the designed theory-testing framework as well as to offer some more detailed view on the adopted procedure. 
+It will respect the following structure.
+First of all we will start by a presentation of two generated datasets and their comparison with the original dataset obtained through a controlled experiment by @llerena2013rose.
+Then we will discuss the technical implementation of the models to test and the resulting estimations over two of the simulated datasets.
+Finally the target performance metrics will be constructed for all the models' performances over both of the datasets and we will compare the obtained estimates with the input values, assessing this way the biases suffered during estimation.

@@ -1,0 +1,180 @@
+---
+output: 
+    pdf_document:
+        toc: FALSE
+        df_print: "kable"
+        fig_width: 5
+        fig_height: 4
+        fig_caption: true
+header-includes:
+    - \usepackage{placeins}
+    - \AtBeginDocument{\let\maketitle\relax}
+fontsize: 11pt
+bibliography: ../../litterature/bibliographie.bib
+nocite: |
+    @llerena2013rose
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+
+\FloatBarrier
+
+\newpage
+
+# Conclusion {-}
+
+<!-- il faut allonger un peu plus cette conclusion
+qq propositions en dessous
+De façon générale la conclusion
+-résume ce qui est fait et ces enjeux
+-résume les résultats importants (les points forts)
+- rappelle les limites (les points faibles)
+- discute les usages possibles, remet en contexte, etc (ouvre le sujet)
+
+Je verrais bien un paragraphe sur l'économie (il faut absolument un rattachement à la discussion économique)
+un paragraphe économétrie vs ML
+un paragraphe conception de l'outil de simulation : ce qui est fait et ce qui pourra être fait et comment sa conception est déjà pensée pour être améliorer et intégrer de nouvelle chose
+un paragraphe sur les résultats : estimation beta et WTP et ajustement
+et les limites de ces résultats: par de bootstrap, de validation croisée, etc
+
+un paragraphe qui ouvre les précédents enjeux, donne les limites et proposent des pistes : économie, économétrie, simulation et validation-évaluation de perf -->
+
+<!-- ok mais pourquoi cela était un sujet intéressant ?
+Je commencerais la conclusion par un paragraphe qui rappelle les enjeux pour les économistes: par ex questions de la bonne spécification des modèles et donc de la mesure correcte des comportements de outputs eco (WTP, etc) ; calibrage plus efficace des expériences et meilleur adéquation expérience avec économétrie
+Ensuite qqch pour économètres ou data scientist sur la concurrence des outils.
+
+Enfin, comment (par quelle méthode) vous avez répondu :
+- conception d'un simulateur
+- mise en place d'un cadre expérimental contrôlé pour l'évaluation des modèles
+- application (donc choix des valeurs à partir d'un contexte concret (les roses))
+- proposition d'un ensemble adapté ou pertinent de valeurs pour évaluer la perf pour ce contexte précis (en ouverture vous pourrez discutez de sa généralisation à d'autres enjeux par ex multinomial plutôt que binomial) -->
+
+<!-- ok, mai s vos choix amonts sont plus nombreux : par ex RUM vs RRM, binary vs multinom -->
+
+In this work we have introduced the reader to the problematic of the different modelling paradigms in application to the consumer choice studies. 
+By means of an experimental theory-testing framework we demonstrate the complexity of the model performance evaluation problematic, showing the eventual bottlenecks and the questions to be answered on all the levels of data exploration procedure. 
+The correct specification of the theoretical assumptions, the dataset generation, the model choice as well as the performance measure choice were studied. 
+The main objective to propose a comprehensive methodology for theory-testing framework creation was accomplished, illustrating the devised frameworks' potential over an economic question issued from real world.
+
+<!-- commencez par "based on large sample generation"...
+d'ailleurs la limite/perspective : pas de bootstrap, pas de taille N différentes en individu ou en nb de situations de choix  -->
+
+Two different consumer choice situation were explored, issued from the setting delimited by @llerena2013rose. 
+The discrete choice context allowed us to compare how the presence of heterogeneous preferences for environmental attributes affected the possibility to identify correctly the underlying utility functions, as well as to derive the WTP and premiums for the attributes. 
+The implementation of artificial dataset simulation techniques proved its potential in creation of fully controlled data samples, providing two consistent datasets constructed under RUM assumptions. 
+Given the data, we could observe, how taste heterogeneity affected the population's choice distribution and the resulting datasets, as well as their impact on models' performances.
+
+<!-- Greene et Hensher (je crois) disent que le MMNL englobe tous les MNL possibles -->
+
+A total of three models, issued from alien disciplines such as econometrics (MNL and MMNL) and ML (CNN-MNL), were implemented over the generated artificial datasets. 
+We could demonstrate the differences and similarities between the traditional econometrics models and such ML techniques as NN. 
+The econometric models allowed us to observe the potential biases that researchers risk to induce using the simplest models in unjustified context. 
+The ML model made it possible to demonstrate, how different approaches to optimisation and algorithmic solutions influence the obtained results. 
+Moreover, the framework demonstrated, that ML models could be used instead of the traditional econometrics techniques under correct specification, as technically NN are able to approximate any other more simple linear or non-linear model. 
+All of the models demonstrated good overall performance given the homogeneous individual preferences setting, while only the most complex MMNL model achieved sufficient results in presence of taste heterogeneity.
+
+The multidimensionality of the explored situation allows us to tear several solutions from this work in terms of model performances in presence of heterogeneous preferences.
+The MMNL models demonstrated a better adaptivity for the different datasets and consequently a better adaptiveness in all the cases.
+This family of models showed a great tolerance for the eventual misspecification in the assumptions of the presence of random effects.
+On the contrary, the MNL models produced biased estimates in the presence of the random effects in population, which indicates a great danger and signal the importance of the correct specifications a preliminary data studies to be performed before the models estimation. 
+The only observed difference was in the way the resulting approximation was unable to directly estimate the variance for the linear part coefficients, which is not initially the main focus of the NN models. 
+However, the marginal effects could still be derived for the individual characteristics or the alternative specific attributes, assuming a correct approximation was used, which does not inflate the overall variance for the marginal effects.
+
+Nevertheless, there exist potential biases that require particular attention and caution in future research. 
+The implemented data-generation procedure risks to bias the results in favour of the econometrics models, which were used to simulate the data. 
+Speaking about the models, we have observed that the adaptiveness and flexibility of the MMNL model comets at some costs in resources efficiency. 
+The time, computation power and the data amount needed to achieve satisfying results are significantly higher than for the other models. 
+
+<!-- voilà pour les résultats
+mais je ferais en 1) l'économie, plus l'économétrie -->
+
+<!-- ok pour l'anlayse homog vs heterog pref. Maintenant vous pouvez ouvrir sur d'autres éléments comportementaux: utilité additive, calsses latentes dans la populations, etc.
+Et ouvrir ensuite sur la question de l'adaptation de l'outil et la démarche pour tester des téhories comme RUM vs RRM QDT ou de la behavioral: time depandnce; risk aversion, etc -->
+
+This work demonstrates only a fraction of the full potential of the theory-testing framework. 
+Many extensions and generalisations should be performed before it could be used at scale. 
+For example, it is particularly interesting to introduce an extension which will provide the possibility to explore and compare how different behavioural theories (RUM, RRM, QDM) affects the estimation results. 
+Even more, with this methodology it becomes possible to explore the effects of non-additive utility presence or the behaviour of populations with mixed behaviours presence. 
+Another extension concerns the implemented mathematical models and consists in incorporating the most recent developments in the ML field into the framework, enabling users to implement such models as decision trees or more advanced NN. 
+Last, but not the least, the framework could be complemented with a methodological tool-set for hypothesis testing using the advantages of a controlled experiment data collection. 
+
+<!-- à développer selon les pistes proposées ? -->
+
+To summarise, we conclude that the experimental framework has proven its importance for the empirical and theoretical studies and has demonstrated its potential.
+There clearly exist a strong need for a more extensive study and development of this framework to provide the research community with a hypothesis testing tool-set, which could be used in the context of the consumer choice modelling.
+The exploration of potential biases and theory-testing will allow us to establish a comprehensive and consistent methodology to be implemented latter in empirical work and controlled experiments in particular. 
+
+
+
+
+
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+
+\newpage
+\renewcommand\contentsname{}
+\setcounter{tocdepth}{4} 
+# Table of contents {-}
+\vspace{-12mm}
+\tableofcontents
+
+\newpage
+# List of figures {-}
+\renewcommand\listfigurename{}
+\vspace{-12mm}
+\listoffigures
+
+\newpage
+# List of tables {-}
+\renewcommand\listtablename{}
+\vspace{-12mm}
+\listoftables
+
+
+
+
+
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+
+\newpage
+
+# Bibliography {-}
+
+<div id="refs"></div>

@@ -1,0 +1,237 @@
+\documentclass[11pt,]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{}
+    \pretitle{\vspace{\droptitle}}
+  \posttitle{}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+\usepackage{placeins}
+\AtBeginDocument{\let\maketitle\relax}
+
+\begin{document}
+
+\FloatBarrier
+
+\newpage
+
+\hypertarget{conclusion}{%
+\section*{Conclusion}\label{conclusion}}
+\addcontentsline{toc}{section}{Conclusion}
+
+In this work we have introduced the reader to the problematic of the
+different modelling paradigms in application to the consumer choice
+studies. By means of an experimental theory-testing framework we
+demonstrate the complexity of the model performance evaluation
+problematic, showing the eventual bottlenecks and the questions to be
+answered on all the levels of data exploration procedure. The correct
+specification of the theoretical assumptions, the dataset generation,
+the model choice as well as the performance measure choice were studied.
+The main objective to propose a comprehensive methodology for
+theory-testing framework creation was accomplished, illustrating the
+devised frameworks' potential over an economic question issued from real
+world.
+
+Two different consumer choice situation were explored, issued from the
+setting delimited by Michaud, Llerena, and Joly (2012). The discrete
+choice context allowed us to compare how the presence of heterogeneous
+preferences for environmental attributes affected the possibility to
+identify correctly the underlying utility functions, as well as to
+derive the WTP and premiums for the attributes. The implementation of
+artificial dataset simulation techniques proved its potential in
+creation of fully controlled data samples, providing two consistent
+datasets constructed under RUM assumptions. Given the data, we could
+observe, how taste heterogeneity affected the population's choice
+distribution and the resulting datasets, as well as their impact on
+models' performances.
+
+A total of three models, issued from alien disciplines such as
+econometrics (MNL and MMNL) and ML (CNN-MNL), were implemented over the
+generated artificial datasets. We could demonstrate the differences and
+similarities between the traditional econometrics models and such ML
+techniques as NN. The econometric models allowed us to observe the
+potential biases that researchers risk to induce using the simplest
+models in unjustified context. The ML model made it possible to
+demonstrate, how different approaches to optimisation and algorithmic
+solutions influence the obtained results. Moreover, the framework
+demonstrated, that ML models could be used instead of the traditional
+econometrics techniques under correct specification, as technically NN
+are able to approximate any other more simple linear or non-linear
+model. All of the models demonstrated good overall performance given the
+homogeneous individual preferences setting, while only the most complex
+MMNL model achieved sufficient results in presence of taste
+heterogeneity.
+
+The multidimensionality of the explored situation allows us to tear
+several solutions from this work in terms of model performances in
+presence of heterogeneous preferences. The MMNL models demonstrated a
+better adaptivity for the different datasets and consequently a better
+adaptiveness in all the cases. This family of models showed a great
+tolerance for the eventual misspecification in the assumptions of the
+presence of random effects. On the contrary, the MNL models produced
+biased estimates in the presence of the random effects in population,
+which indicates a great danger and signal the importance of the correct
+specifications a preliminary data studies to be performed before the
+models estimation. The only observed difference was in the way the
+resulting approximation was unable to directly estimate the variance for
+the linear part coefficients, which is not initially the main focus of
+the NN models. However, the marginal effects could still be derived for
+the individual characteristics or the alternative specific attributes,
+assuming a correct approximation was used, which does not inflate the
+overall variance for the marginal effects.
+
+Nevertheless, there exist potential biases that require particular
+attention and caution in future research. The implemented
+data-generation procedure risks to bias the results in favour of the
+econometrics models, which were used to simulate the data. Speaking
+about the models, we have observed that the adaptiveness and flexibility
+of the MMNL model comets at some costs in resources efficiency. The
+time, computation power and the data amount needed to achieve satisfying
+results are significantly higher than for the other models.
+
+This work demonstrates only a fraction of the full potential of the
+theory-testing framework. Many extensions and generalisations should be
+performed before it could be used at scale. For example, it is
+particularly interesting to introduce an extension which will provide
+the possibility to explore and compare how different behavioural
+theories (RUM, RRM, QDM) affects the estimation results. Even more, with
+this methodology it becomes possible to explore the effects of
+non-additive utility presence or the behaviour of populations with mixed
+behaviours presence. Another extension concerns the implemented
+mathematical models and consists in incorporating the most recent
+developments in the ML field into the framework, enabling users to
+implement such models as decision trees or more advanced NN. Last, but
+not the least, the framework could be complemented with a methodological
+tool-set for hypothesis testing using the advantages of a controlled
+experiment data collection.
+
+To summarise, we conclude that the experimental framework has proven its
+importance for the empirical and theoretical studies and has
+demonstrated its potential. There clearly exist a strong need for a more
+extensive study and development of this framework to provide the
+research community with a hypothesis testing tool-set, which could be
+used in the context of the consumer choice modelling. The exploration of
+potential biases and theory-testing will allow us to establish a
+comprehensive and consistent methodology to be implemented latter in
+empirical work and controlled experiments in particular.
+
+\newpage
+\renewcommand\contentsname{}
+\setcounter{tocdepth}{4}
+
+\hypertarget{table-of-contents}{%
+\section*{Table of contents}\label{table-of-contents}}
+\addcontentsline{toc}{section}{Table of contents}
+
+\vspace{-12mm}
+\tableofcontents
+
+\newpage
+
+\hypertarget{list-of-figures}{%
+\section*{List of figures}\label{list-of-figures}}
+\addcontentsline{toc}{section}{List of figures}
+
+\renewcommand\listfigurename{}
+\vspace{-12mm}
+\listoffigures
+
+\newpage
+
+\hypertarget{list-of-tables}{%
+\section*{List of tables}\label{list-of-tables}}
+\addcontentsline{toc}{section}{List of tables}
+
+\renewcommand\listtablename{}
+\vspace{-12mm}
+\listoftables
+
+\newpage
+
+\hypertarget{bibliography}{%
+\section*{Bibliography}\label{bibliography}}
+\addcontentsline{toc}{section}{Bibliography}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-llerena2013rose}{}%
+Michaud, Celine, Daniel Llerena, and Iragael Joly. 2012. ``Willingness
+to pay for environmental attributes of non-food agricultural products: a
+real choice experiment.'' \emph{European Review of Agricultural
+Economics} 40 (2): 313--29. \url{https://doi.org/10.1093/erae/jbs025}.
+
+
+\end{document}

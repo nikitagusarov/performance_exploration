@@ -1,0 +1,462 @@
+---
+output: 
+  pdf_document:
+    toc: FALSE
+    df_print: "kable"
+    fig_width: 5
+    fig_height: 4
+    fig_caption: true
+header-includes:
+  - \usepackage{placeins}
+  - \AtBeginDocument{\let\maketitle\relax}
+fontsize: 11pt
+bibliography: ../../litterature/bibliographie.bib
+---
+
+
+
+
+
+
+
+```{r Knitr, echo = FALSE}
+#################
+# Knitr options #
+#################
+
+knitr::opts_chunk$set(
+  fig.align = "center",
+  # eval = FALSE,
+  echo = FALSE
+)
+```
+
+```{r Packages, echo= FALSE, include = FALSE}
+####################
+# PAckages and AUX # 
+####################
+
+# General document wide packages
+library(tidyverse)
+library(stargazer)
+```
+
+
+
+
+
+
+
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+<!-- ################################################################## -->
+
+## Performance evaluation and comparison 
+
+This section comprises the results we managed to achieve in the exploration of different performance metrics and provides insights on the functioning of the discussed mathematical models in a given context. 
+As we have seen in the previous part, where the effects' estimates were provided, all of the models are able to provide some estimates for the retaliate utility function parameters in different discrete choice set-ups. 
+The most simple models performed well on the dataset defined by the homogeneous preferences in the population for environmental attributes, underestimating the effects in the presence of preference heterogeneity. 
+In the same time the more complex MMNL model performed sufficiently well in both behavioural set-ups, although it demonstrated some potential problems with the algorithmic implementation.
+
+<!-- cette répétition est-elle nécessaire, sachant que c'est la page qui précède ?
+Il serait bien de rappeler les grandes lignes de l'analyse de la perf / le plan de section ? -->
+
+
+```{r PackagesPerf, echo= FALSE, include = FALSE}
+####################
+# PAckages and AUX #
+####################
+
+# Performance measures
+library(performance)
+
+# Mlogit
+library(mlogit)
+library(neuralnet)
+
+# Aux custom fuctions 
+source("../../code/functions_measures.R")
+```
+
+```{r DataLoad, include = FALSE}
+# list of models to load
+models_load = list(
+  "../../data/memoire/mnl_novar_estimates.Rdata",
+  "../../data/memoire/mmnl_novar_estimates.Rdata",
+  "../../data/memoire/cnn_novar_estimates.Rdata",
+  # "../../data/memoire/rrmcnn_novar_estimates.Rdata",
+  "../../data/memoire/mnl_covar_estimates.Rdata",
+  "../../data/memoire/mmnl_covar_estimates.Rdata",
+  "../../data/memoire/cnn_covar_estimates.Rdata" # ,
+  # "../../data/memoire/rrmcnn_covar_estimates.Rdata"
+)
+
+# Load models from list
+for (i in 1:length(models_load)) {
+  load(models_load[[i]])
+}
+```
+
+```{r PerformanceEval, include = FALSE}
+# Evaluating performances for different models
+mes = list() # Aux object
+## Attention !!! Entry factors should be identically ordered !!!
+mes$mnl_novar_perf = eval_performance(
+  mnl_novar_estimates$predictions$Choice, 
+  ordered(mnl_novar_estimates$predictions$Real, levels = c("C", "A", "B"))
+)
+mes$mmnl_novar_perf = eval_performance(
+  mmnl_novar_estimates$predictions$Choice, 
+  ordered(mmnl_novar_estimates$predictions$Real, levels = c("C", "A", "B"))
+)
+mes$mnl_covar_perf = eval_performance(
+  mnl_covar_estimates$predictions$Choice, 
+  ordered(mnl_covar_estimates$predictions$Real, levels = c("C", "A", "B"))
+)
+mes$mmnl_covar_perf = eval_performance(
+  mmnl_covar_estimates$predictions$Choice, 
+  ordered(mmnl_covar_estimates$predictions$Real, levels = c("C", "A", "B"))
+)
+mes$cnn_novar_perf = eval_performance(
+  cnn_novar_estimates$predictions$Choice, 
+  ordered(cnn_novar_estimates$predictions$Real, levels = c("C", "A", "B"))
+)
+mes$cnn_covar_perf = eval_performance(
+  cnn_covar_estimates$predictions$Choice, 
+  ordered(cnn_covar_estimates$predictions$Real, levels = c("C", "A", "B"))
+)
+# mes$rrmcnn_novar_perf = eval_performance(
+#   rrmcnn_novar_estimates$predictions$Choice, 
+#   ordered(rrmcnn_novar_estimates$predictions$Real, levels = c("C", "A", "B"))
+# )
+# mes$rrmcnn_covar_perf = eval_performance(
+#   rrmcnn_covar_estimates$predictions$Choice, 
+#   ordered(rrmcnn_covar_estimates$predictions$Real, levels = c("C", "A", "B"))
+# )
+```
+
+```{r CreatingPerfMDFs}
+# Data frame composition
+## Aux vars
+model_names = c(
+  "MNL",
+  "MMNL",
+  "CNN",
+  # "ECNN",
+  "MNL",
+  "MMNL",
+  "CNN"#,
+  # "ECNN"
+)
+
+# Create two frames
+## With single metrics
+df_single_m = matrix(
+  ncol = length(mes), 
+  nrow = 4,
+)
+## Names
+colnames(df_single_m) = c(
+  "MNL FE",
+  "MMNL FE",
+  "CNN FE",
+  # "ECNN FE",
+  "MNL RE",
+  "MMNL RE",
+  "CNN RE"#,
+  # "ECNN RE"
+)
+rownames(df_single_m) = c("ERR", "AC", "KLDvec", "KLD")
+## Fillings
+for (i in 1:length(mes)) {
+  df_single_m[1, i] = mes[[i]]$ERR
+  df_single_m[2, i] = mes[[i]]$AC 
+  df_single_m[3, i] = mes[[i]]$KLDvec$intrinsic.discrepancy
+  df_single_m[4, i] = mes[[i]]$KLDmat$intrinsic.discrepancy
+}
+
+## With metrics by alternative
+df_mult = list()
+for (i in 1:length(mes)) {
+  # Dataframe creation
+  df_mult_aux = matrix(
+    ncol = 3, 
+    nrow = 16
+  )
+
+  # Names
+  colnames(df_mult_aux) = paste0(
+    model_names[i], " ",
+    c("C", "A", "B")
+  )
+  rownames(df_mult_aux) = c(
+    "TP", "TN", "FP", "FN",
+    "TPR", "TNR", "FPR", "FNR",
+    "LRp", "LRn",
+    "Precision", "Recall",
+    "GeomMean1", "GeomMean2",
+    "Fmeasure",
+    "ClassRatio"
+  )
+
+  # Dataframe composition
+  df_mult_aux[1, ] = mes[[i]]$TP
+  df_mult_aux[2, ] = mes[[i]]$TN 
+  df_mult_aux[3, ] = mes[[i]]$FP
+  df_mult_aux[4, ] = mes[[i]]$FN
+  df_mult_aux[5, ] = mes[[i]]$TPR 
+  df_mult_aux[6, ] = mes[[i]]$TNR 
+  df_mult_aux[7, ] = mes[[i]]$FPR 
+  df_mult_aux[8, ] = mes[[i]]$FNR 
+  df_mult_aux[9, ] = mes[[i]]$LRp 
+  df_mult_aux[10, ] = mes[[i]]$LRn 
+  df_mult_aux[11, ] = mes[[i]]$Precision 
+  df_mult_aux[12, ] = mes[[i]]$Recall 
+  df_mult_aux[13, ] = mes[[i]]$GeomMean1 
+  df_mult_aux[14, ] = mes[[i]]$GeomMean2 
+  df_mult_aux[15, ] = mes[[i]]$Fmeasure 
+  df_mult_aux[16, ] = mes[[i]]$ClassRatio
+
+  # Write to list 
+  df_mult[[i]] = df_mult_aux
+  rm(df_mult_aux) # Remove aux
+  # Assign names
+  names(df_mult)[i] = model_names[i]
+}
+# Combine dataframes
+# df_mult_m = do.call(cbind, df_mult)
+df_mult_m1 = cbind(df_mult[[1]], df_mult[[2]])
+df_mult_m2 = cbind(df_mult[[4]], df_mult[[5]])
+df_mult_m3 = cbind(df_mult[[3]], df_mult[[6]])
+# df_mult_m3 = cbind(df_mult[[5]], df_mult[[6]])
+# df_mult_m4 = cbind(df_mult[[7]], df_mult[[8]])
+rm(df_mult) # Remove aux
+
+# Starting LogLik0 values for : 
+## mnl_novar = 175777.966186897 
+### iteration 1, step = 1, lnL = 74981.44135026, chi2 = 180637.29557357
+### iteration 7, step = 1, lnL = 53660.60190033, chi2 = 3.44e-06
+## mmnl_novar = 53714.7337717171
+### iteration 1, step = 1, lnL = 53663.09772253, chi2 = 149.08409178
+### iteration 18, step = 1, lnL = 53656.73123084, chi2 = 7.3e-07
+## mnl_covar = 175777.966186897
+### iteration 1, step = 1, lnL = 115445.53784483, chi2 = 112388.6367642
+### iteration 5, step = 1, lnL = 112071.03292338, chi2 = 3.32e-06
+## mmnl_covar = 94446.3524352269
+### iteration 1, step = 1, lnL = 75297.84113602, chi2 = 43800.27833966
+```
+
+### Overall precision
+
+\FloatBarrier
+
+<!-- il faudrait donner l'example d'une lecture des valeurs présenter. Et utiliser les valeurs une fois pour dire qu'un modèle est meilleur qu'un autre, parce la valeur a est plus grande/faible que la b -->
+
+First of all we focus our attention on the general performance metrics, describing how well the estimated models fit the predicted outcomes over an original dataset.
+As we have discussed earlier we use only some of the available measures in an attempt not to make this work too cumbersome.
+The retained performance metrics are: accuracy, describing the overall goodness of fit over observed choices of the subjects; and more complex KDL measure, which compares the distributions instead of more simple metrics, which use only the information available in the confusion matrix.
+
+We can observe the values of these general performance measures, describing overall performance of a given classifier in the table \ref{tab:gpm}. 
+The table regroups the metrics' values for all the estimated models.
+
+<!-- ou qu'au moins un test soit réalisé pour véirifier s'il faut considérer les préf hétérog ou non -->
+
+```{r PerformanceResults_gen, results = "asis", eval = FALSE}
+# Print results
+stargazer(
+  df_single_m[c(2,4),], # Accuracy + KLD
+  title = "General performance measures",
+  summary = FALSE,
+  header = FALSE
+)
+
+mnl_novar_estimates$time
+mmnl_novar_estimates$time
+cnn_novar_estimates$time
+mnl_covar_estimates$time
+mmnl_covar_estimates$time
+cnn_covar_estimates$time
+```
+
+\begin{table}[!htbp] \centering 
+  \caption{General performance measures} 
+  \label{tab:gpm} 
+\begin{tabular}{@{\extracolsep{5pt}} lcccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+& \multicolumn{3}{c}{\textit{Fixed effects}} & \multicolumn{3}{c}{\textit{Random effects}} \\ 
+\cline{2-4}\cline{5-7} 
+\\[-1.8ex] & MNL & MMNL & CNN & MNL & MMNL & CNN \\ 
+\hline \\[-1.8ex] 
+\textbf{Overall measures} $ $ $ $ $ $ \\
+~~~Accuracy & $0.863$ & $0.863$ & $0.723$ & $0.725$ & $0.863$ & $0.721$ \\ 
+\textbf{Probabilistic measures} $ $ $ $ $ $ \\
+~~~KLD & $0.623$ & $0.623$ & $0.328$ & $0.349$ & $0.625$ & $0.317$ \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+
+As we have underlined earlier we observe quite natural situation when the best model in terms of overall performance is the model, which was used in the data generation step. 
+This situation perfectly demonstrates the potential bias, which is explained by our choice of the artificial data-generation algorithm. 
+Nevertheless, it should be noted, that the MNL and MMNL models perform equally well on the fixed effects dataset, where the preferences for the environmental attributes are homogeneous. 
+This fact supports our initial hypothesis that an implementation of a more complex model is preferred when the real effects are unknown to the researcher. 
+
+Focusing our attention on the CNN model observe that the *Adam* algorithm did not outperform the *BFGS* procedure. 
+This observation may be explained by the data-generation set-up, where the generative algorithm favoured the MNL model, rather than *Adam*.
+The latter not supporting the fine tuning over the error distribution.
+
+We can observe the results for the resources efficiency we managed to obtain, which are regrouped in the table \ref{tab:time}.
+Even though we present all the time values, we are mostly interested with the "user" and "system" time values. 
+The first one indicates the CPU time charged for the execution of user instructions of the calling process, while the second one stand for the CPU time spent for execution by the system on behalf of the calling process.
+
+\begin{table}[!htbp] \centering 
+  \caption{Ressources efficiency} 
+  \label{tab:time} 
+\begin{tabular}{@{\extracolsep{5pt}} lcccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+& \multicolumn{3}{c}{\textit{Fixed effects}} & \multicolumn{3}{c}{\textit{Random effects}} \\ 
+\cline{2-4}\cline{5-7} 
+\\[-1.8ex] & MNL & MMNL & CNN & MNL & MMNL & CNN \\ 
+\hline \\[-1.8ex] 
+User & 20.910 & 452.414 & 17.433 & 18.722 & 2066.934 & 16.806 \\
+System & 0.153 & 1.712 & 0.714 & 0.004 & 16.112 & 0.415 \\
+Total & 21.068 & 454.192 & 8.412 & 18.726 & 2083.221 & 7.604 \\
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+
+The more advanced *Adam* algorithm easily bypasses the algorithms available in the *mlogit* package, although this boost in efficiency goes at the cost of lower overall performance and goodness of fit. 
+At the same time, the MMNL implementation is far less efficient and takes 128 times more time, than CNN model.
+This situation clearly illustrates us how the precision and flexibility come at higher costs. 
+
+\FloatBarrier
+
+### Alternative specific metrics
+
+We proceed with a look at some more specific measures. 
+The table \ref{tab:vspm} regroups response specific metrics, that describe the precision of model in predicting only one target class of the dataset.
+These metrics are mostly used when we are interested in some in-depth insight into the model performance and allow to identify the models which perform the best over a single class of interest. 
+Given the context of @llerena2013rose study we are interested in identifying the algorithm which predicts the best "buy" (A and B alternatives) against "not buy" (C) alternative, providing at the same time some information about the alternative chosen.
+In order to evaluate the performance at this dimension we use Geometric mean and the F-measure performance estimators.
+
+\begin{table}[!htbp] \centering 
+  \caption{Variable specific performance measures, fixed effects data} 
+  \label{tab:vspm} 
+\begin{tabular}{@{\extracolsep{5pt}} lcccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+& \multicolumn{3}{c}{\textit{Fixed effects}} & \multicolumn{3}{c}{\textit{Random effects}} \\
+\cline{2-4}\cline{5-7} 
+\\[-1.8ex] & C & A & B & C & A & B \\ 
+\hline \\[-1.8ex] 
+\textbf{Geometric mean} & & & & & & \\
+  ~~~MNL & $0.454$ & $0.848$ & $0.868$ & $0.432$ & $0.696$ & $0.693$ \\
+  ~~~MMNL & $0.454$ & $0.849$ & $0.867$ & $0.452$ & $0.848$ & $0.867$ \\ 
+  ~~~CNN & $0.443$ & $0.697$ & $0.698$ & $0.447$ & $0.697$ & $0.700$ \\
+\textbf{F-measure} & & & & & & \\
+  ~~~MNL & $0.318$ & $0.834$ & $0.873$ & $0.282$ & $0.666$ & $0.704$ \\
+  ~~~MMNL & $0.318$ & $0.834$ & $0.873$ & $0.316$ & $0.833$ & $0.873$ \\ 
+  ~~~CNN & $0.291$ & $0.665$ & $0.706$ & $0.294$ & $0.665$ & $0.707$ \\
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+
+In the table \ref{tab:vspm} we are interested with the entries in the columns corresponding to the "No buy" alternative (C). 
+For the dataset with fixed effects across the population, the MNL and MMNL models perform identically according to both of the selected measures. 
+The CNN model falls behind the econometrics models on the fixed effects dataset, although situation changes in the presence of heterogeneous effects. 
+In the more complex case scenario, when the individuals have varying across population preferences towards one or another attribute, the CNN model outperforms the simple MNL model in detecting "No buy" decisions for given choice sets, which is rather interesting, because the overall model's performance is still inferior to the MNL, as it was shown in table \ref{tab:vspm}.
+
+<!-- allez pkus loin ? 
+Est-ce dû au fait que la distinction A ou B trompe le CNN et pas le MNL ? -->
+
+\FloatBarrier
+
+### Willingness to pay and premiums
+
+Here we should present the most important results comparing the estimates for the WTP, as well as the premiums for particular attributes derived for different models.
+The Premium to pay for a rose's particular attribute as it was described previously can be represented as:
+
+\begin{equation}
+Premium = \frac{
+  \frac{\delta V}{\delta X_k}
+}{
+   \frac{\delta V}{\delta Price}
+}
+\end{equation}
+
+At the same time, the WTP for a rose may be seen as the ratio of two corresponding coefficients of dummy variable and price.
+The table \ref{tab:wtp} presents the estimated WTP and premiums for the models, which output fixed coefficient estimates, without taking into account the randomness of the individual effects.
+In other words, this table regroups the results, which do not require bootstrapping for confidence interval estimation.
+
+<!-- rapplez les targets ?
+peut on tester les différences ? Ca risque de demander les Krinsky & Robb... -->
+
+ \begin{table}[!htbp] \centering  
+   \caption{WTP and Premiums obtained with MNL and CNN}  
+   \label{tab:wtp}  
+ \begin{tabular}{@{\extracolsep{5pt}} lccccc}  
+ \\[-1.8ex]\hline  
+ \hline \\[-1.8ex]  
+& \multicolumn{2}{c}{\textit{Fixed effects}} & \multicolumn{2}{c}{\textit{Random effects}} & \multicolumn{1}{c}{\textit{Target}} \\
+\cline{2-3}\cline{4-5} 
+\\[-1.8ex] & MNL & CNN & MNL & CNN & \\  
+ \hline \\[-1.8ex]  
+ WTP & $1.421$ & $1.377$ & $0.747$ & $0.751$ & $1.401$ \\  
+ Label & $1.731$ & $1.737$ & $1.445$ & $1.442$ & $1.731$ \\  
+ Carbon & $4.091$ & $4.101$ & $3.679$ & $3.669$ & $4.086$ \\  
+ LC & $4.112$ & $4.129$ & $3.378$ & $3.352$ & $4.110$ \\  
+ \hline \\[-1.8ex]  
+ \end{tabular}  
+ \end{table}  
+
+For the estimation of the WTP and the premiums for more complex models (the MMNL in our case) we use the same procedure, as was implemented by @llerena2013rose.
+Because the random parameters are assumed to be correlated in the MMNL model's specification, the estimated standard deviations and confidence intervals are obtained using the Krinsky and Robb parametric bootstrapping method [@krinsky1986approximating]. 
+This procedure consists of generating of multiple random draws from a multivariate normal distribution and using the obtained results to obtain the confidence interval estimates. 
+Exactly as in the original study we generate 1000 draws from a multivariate normal distribution ($MNV(\mu, \Sigma)$), with the coefficient estimates as means $\mu$ and the estimated variance-covariance matrix of the random parameters as $\Sigma$.
+
+<!-- targets ?
+Pour la soutenance : réfléchir à un graphe pour présenter ces résultats -->
+
+The obtained results are then summarised as follows in the table \ref{tab:wtpr}
+
+\begin{table}[!htbp] \centering 
+  \caption{WTP and Premiums obtained with MMNL} 
+  \label{tab:wtpr} 
+\begin{tabular}{@{\extracolsep{5pt}}lccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex]  
+& \multicolumn{6}{c}{\textit{Statistics}} \\
+\cline{2-7} 
+\\[-1.8ex] & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Pctl(25)} & \multicolumn{1}{c}{Pctl(75)} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+\textbf{Fixed effects} & & & & & & \\
+  ~~~WTP & 1.416 & 0.058 & 1.233 & 1.377 & 1.455 & 1.613 \\ 
+  ~~~Label & 1.732 & 0.019 & 1.672 & 1.720 & 1.745 & 1.791 \\ 
+  ~~~Carbon & 4.097 & 0.103 & 3.730 & 4.026 & 4.166 & 4.434 \\ 
+  ~~~LC & 4.116 & 0.098 & 3.741 & 4.051 & 4.182 & 4.421 \\ 
+\textbf{Random effects} & & & & & & \\ 
+  ~~~WTP & 1.360 & 1.887 & $-$4.239 & 0.073 & 2.662 & 7.893 \\ 
+  ~~~Label & 1.243 & 1.667 & $-$3.867 & 0.104 & 2.330 & 6.638 \\ 
+  ~~~Carbon & 3.467 & 2.323 & $-$4.026 & 1.880 & 5.043 & 11.671 \\ 
+  ~~~LC & 3.036 & 3.240 & $-$7.430 & 0.908 & 5.160 & 14.259 \\ 
+\textbf{Target} & & & & & & \\
+  ~~~WTP & 1.418 & 1.973 & $-$4.474 & 0.058 & 2.798 & 6.706 \\
+  ~~~Label & 1.735 & 1.611 & $-$2.652 & 0.653 & 2.849 & 6.709 \\ 
+  ~~~Carbon & 4.076 & 2.134 & $-$1.774 & 2.608 & 5.543 & 11.217 \\ 
+  ~~~LC & 4.106 & 3.379 & $-$6.304 & 1.913 & 6.439 & 14.612 \\ 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{6}{r}{The estimates are obtained with 1000 draws from MNV distribution} \\ 
+\end{tabular} 
+\end{table} 
+
+Comparing the estimates to the input values we observe that the variance of the WTP and Premiums estimates, estimated over a fixed effects dataset, do not potentially affect the conclusion one can derive from the results. 
+The values stay positive with the 75% interval within 0.2€ of the mean estimate. 
+Assuming the model is not re-estimated and adjusted after the insignificant estimators are obtained for Choleski matrix elements, the results remain valid. 
+
+We may conclude, that given sufficiently large dataset the implementation of more complex model is preferable, because it will allow to control for unknown parameters without adding a risk of obtaining biased results. 
+The more simple models, should be preferred in a more restricted context. 
+They allow to obtain the valid results only in the case of correct theoretical assumptions, biasing the estimates in other conditions. 
+Consequently, in the presence of uncertainty about the presence of heterogeneity in the customer choice modelling questions there is a strong interest to implement a more complex model, readjusting it afterwards if needed.
+
+\FloatBarrier
