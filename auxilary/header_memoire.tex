@@ -1,0 +1,99 @@
+% Colors
+% \usepackage{colortbl}
+
+% Change section names style
+\titlegraphic{
+  \vspace{-20mm}
+  \flushright
+  \includegraphics[height = 8mm]{../images/lig_logo_1.png}
+  \includegraphics[height = 8mm]{../images/gael_logo_3.jpg}
+  \includegraphics[height = 8mm]{../images/uga_logo.png} 
+}
+
+%%%%%%%%%%%%%%%%%
+% Load Packages %
+%%%%%%%%%%%%%%%%%
+
+% Spacings
+\usepackage{setspace}
+
+% Tables
+\usepackage{longtable}
+\usepackage{tabu}
+
+% Floats
+\usepackage{morefloats}
+\usepackage{float}
+\usepackage{placeins}
+
+% Highlighting
+\usepackage{soul}
+
+% Horizontal page position
+\usepackage{pdflscape}
+
+% Append pdfs
+\usepackage{pdfpages}
+
+% Add latex chunks
+\usepackage{docmute}
+
+% Short toc
+\usepackage{shorttoc}
+%\setcounter{tocdepth}{1}
+%\usepackage{minitoc} - incompatible with document class
+
+% Referencing mutliple things with a single command - \cref
+\usepackage{cleveref}
+
+% Array
+\usepackage{array}
+
+% Multiple columns
+\usepackage{multicol}
+
+% Image insertion and colors
+\usepackage{graphicx}
+
+% Latex comments
+\newenvironment{dummy}{}{}
+
+% Fonts
+% \usepackage{fontspec}
+% \setmainfont{Museo}
+
+% drawing
+\usepackage{tikz}
+\usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
+
+\usepackage{dcolumn}
+% \usepackage{subfig}
+\usepackage[export]{adjustbox}
+% \usepackage[demo]{graphicx}  
+\usepackage{subcaption}
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{arrows.meta}
+\usepackage[edges]{forest}
+
+\usepackage{calc}
+
+
+% Add footline
+\makeatletter
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}{Nikita Gusarov}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{institute in head/foot}\insertshortdate
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+    \usebeamerfont{date in head/foot}\insertshortinstitute{}\hspace*{1em}
+   %\insertframenumber{} / \inserttotalframenumber\hspace*{2ex} % old version
+    \insertframenumber{} \hspace*{2ex} % new version without total frames
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\makeatother
